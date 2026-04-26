@@ -4,7 +4,7 @@
 # Keep this file
 !.gitignore
 
-# Track only the ExpiryX landing folder
-!expiryx/
-!expiryx/**
+# Track only the ExpiryX landing files at repo root
+!index.html
+!app-arm64-v8a-release.apk
 
