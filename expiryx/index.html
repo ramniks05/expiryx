@@ -1,0 +1,1553 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ExpiryX — Expiry Reminder</title>
+    <meta
+      name="description"
+      content="ExpiryX is an expiry reminder app to track expiry dates, upload invoices & warranty cards, and get smart reminders before things expire."
+    />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://expiryx.app/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ExpiryX" />
+    <meta property="og:title" content="ExpiryX — Expiry Reminder" />
+    <meta
+      property="og:description"
+      content="Track expiry dates, upload invoices & warranty cards, and get reminders — all in ExpiryX."
+    />
+    <meta property="og:url" content="https://expiryx.app/" />
+    <meta property="og:image" content="https://expiryx.app/og.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ExpiryX — Expiry Reminder" />
+    <meta
+      name="twitter:description"
+      content="Track expiry dates, upload invoices & warranty cards, and get reminders — all in ExpiryX."
+    />
+    <meta name="twitter:image" content="https://expiryx.app/og.png" />
+
+    <!-- SVG favicon (data URI) -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%234b5cff'/%3E%3Cstop offset='1' stop-color='%238a3dff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='6' y='6' width='52' height='52' rx='14' fill='url(%23g)'/%3E%3Cpath d='M22 24h20v6H30v4h12v6H22V24zm8 8h6l6 8h-7l-5-8z' fill='white' opacity='0.98'/%3E%3C/svg%3E"
+    />
+
+    <style>
+      :root {
+        color-scheme: light;
+        --bg0: #070912;
+        --bg1: #0a0f22;
+        --card: rgba(255, 255, 255, 0.08);
+        --card2: rgba(255, 255, 255, 0.06);
+        --stroke: rgba(255, 255, 255, 0.14);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.72);
+        --muted2: rgba(255, 255, 255, 0.58);
+        --shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+        --shadow2: 0 8px 24px rgba(0, 0, 0, 0.35);
+        --radius: 18px;
+        --radius2: 22px;
+        --accent: #4b5cff;
+        --accent2: #8a3dff;
+        --accent3: #22d3ee;
+        --focus: rgba(34, 211, 238, 0.85);
+        --maxw: 1120px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          "Apple Color Emoji",
+          "Segoe UI Emoji";
+        line-height: 1.5;
+        background:
+          radial-gradient(1200px 800px at 18% 6%, rgba(75, 92, 255, 0.28), transparent 60%),
+          radial-gradient(1000px 700px at 90% 16%, rgba(138, 61, 255, 0.22), transparent 55%),
+          radial-gradient(900px 600px at 72% 82%, rgba(34, 211, 238, 0.16), transparent 58%),
+          linear-gradient(180deg, var(--bg0), var(--bg1));
+        color: var(--text);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .container {
+        width: 100%;
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 0 18px;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: -999px;
+        top: 8px;
+        z-index: 9999;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .skip-link:focus {
+        left: 12px;
+        outline: 3px solid var(--focus);
+        outline-offset: 2px;
+      }
+
+      :focus-visible {
+        outline: 3px solid var(--focus);
+        outline-offset: 3px;
+        border-radius: 10px;
+      }
+
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(7, 9, 18, 0.65);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 0;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(20px 20px at 35% 30%, rgba(255, 255, 255, 0.24), transparent 55%),
+          linear-gradient(135deg, rgba(75, 92, 255, 0.95), rgba(138, 61, 255, 0.92));
+        box-shadow:
+          0 14px 34px rgba(75, 92, 255, 0.20),
+          0 16px 40px rgba(138, 61, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+      }
+
+      .logo span {
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: rgba(255, 255, 255, 0.96);
+        font-size: 14px;
+      }
+
+      .brand-name {
+        display: grid;
+        gap: 1px;
+        line-height: 1.1;
+        min-width: 0;
+      }
+
+      .brand-name strong {
+        font-size: 14px;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .brand-name small {
+        font-size: 12px;
+        color: var(--muted2);
+      }
+
+      .nav-links {
+        display: none;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .nav-links a {
+        font-size: 13px;
+        color: var(--muted);
+        padding: 10px 10px;
+        border-radius: 12px;
+        border: 1px solid transparent;
+      }
+
+      .nav-links a:hover {
+        color: rgba(255, 255, 255, 0.92);
+        border-color: rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .nav-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .pill-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--accent3), var(--accent));
+        box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.10);
+      }
+
+      .menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.92);
+        cursor: pointer;
+      }
+
+      .menu-icon {
+        width: 18px;
+        height: 18px;
+        display: block;
+      }
+
+      .mobile-drawer {
+        display: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.10);
+        padding: 10px 0 14px;
+      }
+
+      .mobile-drawer[aria-hidden="false"] {
+        display: block;
+      }
+
+      .mobile-drawer a {
+        display: block;
+        padding: 12px 12px;
+        border-radius: 14px;
+        color: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.05);
+        margin-top: 8px;
+      }
+
+      main {
+        padding-bottom: 64px;
+      }
+
+      section {
+        padding: 56px 0;
+      }
+
+      .hero {
+        padding-top: 54px;
+      }
+
+      .hero-grid {
+        display: grid;
+        gap: 22px;
+        align-items: center;
+      }
+
+      .kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--muted);
+        width: fit-content;
+      }
+
+      .kicker strong {
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .kicker span {
+        font-size: 12px;
+        color: var(--muted2);
+      }
+
+      .hero h1 {
+        margin: 14px 0 8px;
+        font-size: clamp(34px, 7vw, 56px);
+        line-height: 1.03;
+        letter-spacing: -0.04em;
+      }
+
+      .hero h1 .grad {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.70));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .hero .tagline {
+        margin: 0 0 12px;
+        font-size: 16px;
+        color: var(--muted);
+      }
+
+      .hero .value {
+        margin: 0;
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.80);
+        max-width: 54ch;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 18px;
+        align-items: center;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border-radius: 16px;
+        padding: 12px 14px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        box-shadow: var(--shadow2);
+        color: rgba(255, 255, 255, 0.92);
+        font-weight: 650;
+        letter-spacing: 0.01em;
+        min-height: 46px;
+        transition: transform 0.14s ease, background 0.14s ease, border-color 0.14s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.09);
+        border-color: rgba(255, 255, 255, 0.18);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, rgba(75, 92, 255, 0.98), rgba(138, 61, 255, 0.96));
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow:
+          0 18px 46px rgba(75, 92, 255, 0.22),
+          0 18px 52px rgba(138, 61, 255, 0.16);
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, rgba(75, 92, 255, 1), rgba(138, 61, 255, 0.98));
+      }
+
+      .btn[aria-disabled="true"] {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      .btn .sub {
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.84);
+      }
+
+      .note {
+        font-size: 12px;
+        color: var(--muted2);
+      }
+
+      .hero-card {
+        position: relative;
+        border-radius: var(--radius2);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .hero-card::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        background:
+          radial-gradient(500px 260px at 20% 18%, rgba(75, 92, 255, 0.20), transparent 60%),
+          radial-gradient(460px 240px at 80% 20%, rgba(138, 61, 255, 0.16), transparent 55%),
+          radial-gradient(520px 280px at 70% 85%, rgba(34, 211, 238, 0.10), transparent 60%);
+        pointer-events: none;
+      }
+
+      .hero-card-inner {
+        position: relative;
+        padding: 18px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .preview-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .chip {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.78);
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .chip b {
+        color: rgba(255, 255, 255, 0.92);
+        font-weight: 700;
+      }
+
+      .mini {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 12px;
+      }
+
+      .glass {
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .mini .glass {
+        padding: 12px;
+      }
+
+      .metric {
+        display: grid;
+        gap: 6px;
+      }
+
+      .metric .label {
+        color: var(--muted2);
+        font-size: 12px;
+      }
+
+      .metric .value {
+        font-weight: 760;
+        letter-spacing: -0.02em;
+      }
+
+      .bar {
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        overflow: hidden;
+      }
+
+      .bar > span {
+        display: block;
+        height: 100%;
+        width: 68%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(34, 211, 238, 0.9), rgba(75, 92, 255, 0.9));
+      }
+
+      .doc-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .doc {
+        height: 72px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.04));
+        position: relative;
+        overflow: hidden;
+      }
+
+      .doc::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.10), transparent);
+        transform: translateX(-100%);
+        animation: shimmer 2.4s ease-in-out infinite;
+        opacity: 0.6;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-120%);
+        }
+        50% {
+          transform: translateX(120%);
+        }
+        100% {
+          transform: translateX(120%);
+        }
+      }
+
+      .section-head {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: -0.02em;
+      }
+
+      .section-head p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 70ch;
+        font-size: 14px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .card {
+        border-radius: var(--radius);
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: var(--shadow2);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .card h3 {
+        margin: 0 0 6px;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background:
+          radial-gradient(18px 18px at 35% 30%, rgba(255, 255, 255, 0.20), transparent 55%),
+          linear-gradient(135deg, rgba(75, 92, 255, 0.35), rgba(138, 61, 255, 0.25));
+      }
+
+      .icon svg {
+        width: 22px;
+        height: 22px;
+        opacity: 0.95;
+      }
+
+      .steps {
+        display: grid;
+        gap: 12px;
+      }
+
+      .step {
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        gap: 12px;
+        align-items: start;
+      }
+
+      .step .n {
+        width: 44px;
+        height: 44px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-weight: 850;
+        letter-spacing: -0.02em;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .step h3 {
+        margin: 0 0 4px;
+        font-size: 15px;
+      }
+
+      .step p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .shots {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 10px;
+        overflow: auto;
+        padding-bottom: 4px;
+        scroll-snap-type: x mandatory;
+      }
+
+      .shot {
+        scroll-snap-align: start;
+        min-width: 180px;
+        height: 120px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: var(--shadow2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .shot::after {
+        content: "Screenshot";
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .about {
+        display: grid;
+        gap: 12px;
+      }
+
+      .about p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        max-width: 78ch;
+      }
+
+      .about-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .bio-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .bio-id {
+        display: grid;
+        gap: 2px;
+      }
+
+      .bio-id strong {
+        font-size: 15px;
+        letter-spacing: -0.01em;
+      }
+
+      .bio-id small {
+        font-size: 12px;
+        color: var(--muted2);
+      }
+
+      .contact-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .contact-item {
+        display: grid;
+        gap: 6px;
+      }
+
+      .contact-item .k {
+        font-size: 12px;
+        color: var(--muted2);
+      }
+
+      .contact-item .v {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 650;
+        letter-spacing: -0.01em;
+      }
+
+      .faq {
+        display: grid;
+        gap: 10px;
+      }
+
+      details {
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: var(--shadow2);
+        overflow: hidden;
+      }
+
+      summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        user-select: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .q {
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .chev {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        opacity: 0.86;
+        transition: transform 0.16s ease;
+      }
+
+      details[open] .chev {
+        transform: rotate(180deg);
+      }
+
+      .a {
+        padding: 0 16px 14px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      footer {
+        padding: 30px 0 42px;
+        border-top: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(7, 9, 18, 0.30);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .footer-inner {
+        display: grid;
+        gap: 10px;
+        align-items: start;
+      }
+
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        color: var(--muted2);
+        font-size: 13px;
+      }
+
+      .footer-links a {
+        padding: 8px 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .footer-links a:hover {
+        border-color: rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .fineprint {
+        color: var(--muted2);
+        font-size: 12px;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      @media (min-width: 820px) {
+        section {
+          padding: 76px 0;
+        }
+
+        .nav-links {
+          display: inline-flex;
+        }
+
+        .menu-btn {
+          display: none;
+        }
+
+        .hero-grid {
+          grid-template-columns: 1.12fr 0.88fr;
+          gap: 26px;
+        }
+
+        .hero-card-inner {
+          padding: 20px;
+        }
+
+        .grid.features {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .steps {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .step {
+          grid-template-columns: 1fr;
+        }
+
+        .step .n {
+          margin-bottom: 10px;
+        }
+
+        .shots {
+          grid-template-columns: repeat(6, 1fr);
+          overflow: visible;
+        }
+
+        .shot {
+          min-width: auto;
+        }
+
+        .footer-inner {
+          grid-template-columns: 1fr auto;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .about-grid {
+          grid-template-columns: 1.35fr 0.65fr;
+          align-items: start;
+        }
+
+        .contact-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="nav" role="banner">
+      <div class="container">
+        <div class="nav-inner">
+          <a class="brand" href="#top" aria-label="ExpiryX home">
+            <div class="logo" aria-hidden="true"><span>EX</span></div>
+            <div class="brand-name">
+              <strong>ExpiryX</strong>
+              <small>Expiry Reminder</small>
+            </div>
+          </a>
+
+          <nav class="nav-links" aria-label="Primary">
+            <a href="#features">Features</a>
+            <a href="#how">How it works</a>
+            <a href="#about">About</a>
+            <a href="#developer">Developer</a>
+            <a href="#contact">Contact</a>
+            <a href="#faq">FAQ</a>
+          </nav>
+
+          <div class="nav-cta">
+            <div class="pill" aria-label="Status">
+              <span class="pill-dot" aria-hidden="true"></span>
+              <span>Fast, private, simple</span>
+            </div>
+            <button
+              class="menu-btn"
+              type="button"
+              aria-label="Open menu"
+              aria-expanded="false"
+              aria-controls="mobile-drawer"
+              id="menuBtn"
+            >
+              <svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  fill="currentColor"
+                  d="M4 6.5h16a1 1 0 1 0 0-2H4a1 1 0 1 0 0 2zm0 7h16a1 1 0 1 0 0-2H4a1 1 0 1 0 0 2zm0 7h16a1 1 0 1 0 0-2H4a1 1 0 1 0 0 2z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <nav id="mobile-drawer" class="mobile-drawer" aria-label="Mobile" aria-hidden="true">
+          <a href="#features">Features</a>
+          <a href="#how">How it works</a>
+          <a href="#about">About</a>
+          <a href="#developer">Developer</a>
+          <a href="#contact">Contact</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <div id="top" class="sr-only" aria-hidden="true">Top</div>
+
+      <section class="hero">
+        <div class="container">
+          <div class="hero-grid">
+            <div>
+              <div class="kicker" aria-label="Launch message">
+                <strong>ExpiryX</strong>
+                <span>expiry tracking, simplified</span>
+              </div>
+              <h1><span class="grad">ExpiryX</span></h1>
+              <p class="tagline">Expiry Reminder</p>
+              <p class="value">
+                Track expiry dates, upload invoices & warranty cards, and get smart reminders before anything expires.
+              </p>
+
+              <div class="cta-row" role="group" aria-label="Store links">
+                <a
+                  class="btn btn-primary"
+                  href="./app-arm64-v8a-release.apk"
+                  aria-label="Download ExpiryX APK"
+                  rel="noopener"
+                  download
+                >
+                  <span aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M4.4 3.7c-.25.3-.4.76-.4 1.35v13.9c0 .6.15 1.05.4 1.35l.06.06L13 12 4.46 3.64l-.06.06Z"
+                        fill="rgba(255,255,255,.92)"
+                      />
+                      <path
+                        d="M16.2 14.9 13 12l3.2-2.9 3.76 2.14c.86.49.86 1.15 0 1.64l-3.76 2.14Z"
+                        fill="rgba(255,255,255,.92)"
+                      />
+                      <path
+                        d="M4.46 20.36 13 12l3.2 2.9-4.85 2.76c-.78.44-1.62.82-2.64 1.1-.9.24-1.5.2-1.93-.14l-.32-.26Z"
+                        fill="rgba(255,255,255,.92)"
+                        opacity=".86"
+                      />
+                      <path
+                        d="M4.46 3.64 6.46 2c.43-.34 1.03-.38 1.93-.14 1.02.28 1.86.66 2.64 1.1L16.2 9.1 13 12 4.46 3.64Z"
+                        fill="rgba(255,255,255,.92)"
+                        opacity=".86"
+                      />
+                    </svg>
+                  </span>
+                  <span>Download APK</span>
+                </a>
+
+                <a
+                  class="btn"
+                  id="appStoreBtn"
+                  href="APPSTORE_LINK_HERE"
+                  aria-label="Download on the App Store"
+                  rel="noopener"
+                >
+                  <span aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path
+                        fill="currentColor"
+                        d="M16.6 13.1c0-2 1.6-3 1.7-3.1-1-1.4-2.6-1.6-3.2-1.6-1.4-.1-2.7.8-3.4.8s-1.8-.8-3-.8c-1.5 0-2.9.9-3.7 2.2-1.6 2.7-.4 6.7 1.1 8.9.7 1.1 1.6 2.3 2.8 2.2 1.1 0 1.6-.7 3-.7s1.8.7 3 .7c1.2 0 2-1.1 2.7-2.2.9-1.3 1.2-2.6 1.2-2.7-.1 0-2.2-.9-2.2-3.2Z"
+                        opacity=".92"
+                      />
+                      <path
+                        fill="currentColor"
+                        d="M14.9 6.6c.6-.7 1-1.7.9-2.7-.9 0-2 .6-2.6 1.3-.6.7-1.1 1.7-.9 2.7 1 0 2-.5 2.6-1.3Z"
+                        opacity=".92"
+                      />
+                    </svg>
+                  </span>
+                  <span>Download on the App Store</span>
+                </a>
+
+                <span class="note" id="iosNote" aria-live="polite" hidden>Available soon on iOS.</span>
+              </div>
+            </div>
+
+            <div class="hero-card" aria-label="App preview placeholder">
+              <div class="hero-card-inner">
+                <div class="preview-top">
+                  <span class="chip"><b>Smart</b> extraction</span>
+                  <span class="chip"><b>OTP</b> sign-in</span>
+                </div>
+                <div class="mini">
+                  <div class="glass metric" aria-label="Upcoming expiries">
+                    <div class="label">Upcoming expiries</div>
+                    <div class="value">3 items this month</div>
+                    <div class="bar" aria-hidden="true"><span></span></div>
+                  </div>
+                  <div class="glass metric" aria-label="Documents limit">
+                    <div class="label">Per document</div>
+                    <div class="value">Max 2 photos</div>
+                    <div class="label">Fast & tidy</div>
+                  </div>
+                </div>
+                <div class="glass" style="padding: 12px" aria-label="Document tiles placeholder">
+                  <div class="label" style="color: var(--muted2); font-size: 12px; margin-bottom: 10px">
+                    Documents
+                  </div>
+                  <div class="doc-grid" aria-hidden="true">
+                    <div class="doc"></div>
+                    <div class="doc"></div>
+                    <div class="doc"></div>
+                    <div class="doc"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" aria-labelledby="features-title">
+        <div class="container">
+          <div class="section-head">
+            <h2 id="features-title">Features built for clarity</h2>
+            <p>
+              ExpiryX keeps your important documents lightweight and organized while ensuring you never miss an expiry.
+            </p>
+          </div>
+
+          <div class="grid features">
+            <article class="card">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M8 3h6l4 4v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
+                    stroke="rgba(255,255,255,.92)"
+                    stroke-width="1.6"
+                  />
+                  <path
+                    d="M14 3v4a1 1 0 0 0 1 1h3"
+                    stroke="rgba(255,255,255,.92)"
+                    stroke-width="1.6"
+                  />
+                </svg>
+              </div>
+              <h3>Max 2 photos per document</h3>
+              <p>Capture what matters: invoice + warranty card, clean and fast.</p>
+            </article>
+
+            <article class="card">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M4 7h16M4 12h10M4 17h16"
+                    stroke="rgba(255,255,255,.92)"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M17 12l2 2 4-4"
+                    transform="translate(-2 4)"
+                    stroke="rgba(34,211,238,.95)"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <h3>Smart extraction</h3>
+              <p>Auto-fills expiry date, brand, and key fields from your photos.</p>
+            </article>
+
+            <article class="card">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 22a9 9 0 1 0-9-9"
+                    stroke="rgba(255,255,255,.92)"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M12 7v6l4 2"
+                    stroke="rgba(255,255,255,.92)"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M4 16v6h6"
+                    stroke="rgba(34,211,238,.95)"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <h3>Expiry reminders</h3>
+              <p>Gentle notifications before warranties, memberships, or products expire.</p>
+            </article>
+
+            <article class="card">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M4 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z"
+                    stroke="rgba(255,255,255,.92)"
+                    stroke-width="1.6"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M8 12h8"
+                    stroke="rgba(34,211,238,.95)"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </div>
+              <h3>Categories</h3>
+              <p>Group items like electronics, appliances, subscriptions, and more.</p>
+            </article>
+
+            <article class="card">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 2l8 4v6c0 5-3.4 9.6-8 10-4.6-.4-8-5-8-10V6l8-4Z"
+                    stroke="rgba(255,255,255,.92)"
+                    stroke-width="1.6"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M9 12l2 2 4-5"
+                    stroke="rgba(34,211,238,.95)"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <h3>Secure sign-in (OTP)</h3>
+              <p>Quick access with OTP-based sign-in designed for convenience.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="how" aria-labelledby="how-title">
+        <div class="container">
+          <div class="section-head">
+            <h2 id="how-title">How it works</h2>
+            <p>Three simple steps from photo to reminder—no clutter, no fuss.</p>
+          </div>
+
+          <div class="steps">
+            <div class="card step">
+              <div class="n" aria-hidden="true">1</div>
+              <div>
+                <h3>Add photos</h3>
+                <p>Upload up to two photos per document: invoice + warranty card.</p>
+              </div>
+            </div>
+            <div class="card step">
+              <div class="n" aria-hidden="true">2</div>
+              <div>
+                <h3>Auto-fill</h3>
+                <p>ExpiryX extracts key details and suggests category & expiry date.</p>
+              </div>
+            </div>
+            <div class="card step">
+              <div class="n" aria-hidden="true">3</div>
+              <div>
+                <h3>Save & get reminders</h3>
+                <p>Confirm details once, then get reminders before expiry.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="shots-title">
+        <div class="container">
+          <div class="section-head">
+            <h2 id="shots-title">Screenshots</h2>
+            <p>Placeholders for app screens. Replace with real images when ready.</p>
+          </div>
+
+          <div class="shots" aria-label="Screenshots placeholder strip">
+            <div class="shot" role="img" aria-label="Screenshot placeholder 1"></div>
+            <div class="shot" role="img" aria-label="Screenshot placeholder 2"></div>
+            <div class="shot" role="img" aria-label="Screenshot placeholder 3"></div>
+            <div class="shot" role="img" aria-label="Screenshot placeholder 4"></div>
+            <div class="shot" role="img" aria-label="Screenshot placeholder 5"></div>
+            <div class="shot" role="img" aria-label="Screenshot placeholder 6"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" aria-labelledby="about-title">
+        <div class="container">
+          <div class="section-head">
+            <h2 id="about-title">About ExpiryX</h2>
+            <p>Designed to feel calm, premium, and dependable—like your digital document wallet.</p>
+          </div>
+
+          <div class="card about">
+            <p>
+              ExpiryX helps you stay ahead of expiries by keeping invoices and warranty cards organized in a clean,
+              lightweight format. Add documents in seconds, let the app auto-fill details, and rely on timely reminders
+              so you never miss a warranty, subscription renewal, or product expiry again.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="developer" aria-labelledby="developer-title">
+        <div class="container">
+          <div class="section-head">
+            <h2 id="developer-title">Developer story</h2>
+            <p>The people behind ExpiryX—and why it’s built to be reliable.</p>
+          </div>
+
+          <div class="about-grid">
+            <div class="card about" aria-label="Developer story card">
+              <div class="bio-top">
+                <div class="bio-id">
+                  <strong>Ramesh Kumar</strong>
+                  <small>Project Manager at NIC (Government sector) • 12+ years in Java & full‑stack development</small>
+                </div>
+                <span class="chip" aria-label="Experience highlight"><b>12+ years</b> building dependable systems</span>
+              </div>
+              <p style="margin-top: 12px">
+                ExpiryX started with a simple frustration: important invoices and warranty cards are easy to misplace,
+                and expiry dates are easy to forget—until it’s too late. Over the years, Ramesh has worked across Java
+                platforms and full‑stack systems where reliability, auditability, and user trust aren’t optional—they’re
+                the baseline.
+              </p>
+              <p style="margin-top: 10px">
+                That mindset shaped ExpiryX into a calm, focused experience: capture a document in seconds, extract the
+                key details, and let reminders quietly do their job. The goal is not to overwhelm you with features, but
+                to make one thing feel effortless—staying ahead of expiries with clean data and a premium, dependable
+                workflow.
+              </p>
+              <p style="margin-top: 10px">
+                Today, while working as a Project Manager at NIC in the government sector, Ramesh continues to bring
+                disciplined engineering practices to the product—designing flows that are simple on the surface and
+                robust underneath.
+              </p>
+            </div>
+
+            <div class="card" aria-label="Developer highlights">
+              <h3>What ExpiryX optimizes for</h3>
+              <p style="margin-top: 6px">Premium UX, practical constraints, and trust-first design.</p>
+              <div style="margin-top: 12px; display: grid; gap: 10px">
+                <div class="glass" style="padding: 12px">
+                  <div class="metric">
+                    <div class="label">Clarity</div>
+                    <div class="value">A clean, focused flow</div>
+                  </div>
+                </div>
+                <div class="glass" style="padding: 12px">
+                  <div class="metric">
+                    <div class="label">Reliability</div>
+                    <div class="value">Built like a system</div>
+                  </div>
+                </div>
+                <div class="glass" style="padding: 12px">
+                  <div class="metric">
+                    <div class="label">Speed</div>
+                    <div class="value">Fast capture & retrieval</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" aria-labelledby="contact-title">
+        <div class="container">
+          <div class="section-head">
+            <h2 id="contact-title">Contact us</h2>
+            <p>Questions, partnerships, or feedback—reach out anytime.</p>
+          </div>
+
+          <div class="card">
+            <div class="contact-grid" role="list" aria-label="Contact details">
+              <div class="contact-item" role="listitem">
+                <div class="k">Developer</div>
+                <div class="v">Ramesh Kumar</div>
+              </div>
+              <div class="contact-item" role="listitem">
+                <div class="k">Email</div>
+                <div class="v">
+                  <a href="mailto:ramsitservices05@gmail.com" aria-label="Email ramsitservices05@gmail.com"
+                    >ramsitservices05@gmail.com</a
+                  >
+                </div>
+              </div>
+              <div class="contact-item" role="listitem">
+                <div class="k">Mobile</div>
+                <div class="v">
+                  <a href="tel:+917903152429" aria-label="Call +91 7903152429">+91 7903152429</a>
+                </div>
+              </div>
+              <div class="contact-item" role="listitem">
+                <div class="k">Response time</div>
+                <div class="v">Typically within 1–2 business days</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" aria-labelledby="faq-title">
+        <div class="container">
+          <div class="section-head">
+            <h2 id="faq-title">FAQ</h2>
+            <p>Quick answers to common questions.</p>
+          </div>
+
+          <div class="faq" role="region" aria-label="Frequently asked questions">
+            <details class="faq-item">
+              <summary aria-label="What can I store in ExpiryX?">
+                <span class="q">What can I store in ExpiryX?</span>
+                <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="rgba(255,255,255,.92)"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </summary>
+              <div class="a">
+                Store invoices, warranty cards, and any item where an expiry date matters—products, memberships, and
+                subscriptions.
+              </div>
+            </details>
+
+            <details class="faq-item">
+              <summary aria-label="Why only two photos per document?">
+                <span class="q">Why only two photos per document?</span>
+                <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="rgba(255,255,255,.92)"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </summary>
+              <div class="a">
+                It keeps documents fast to load and easy to manage. Most use-cases are covered by invoice + warranty
+                card.
+              </div>
+            </details>
+
+            <details class="faq-item">
+              <summary aria-label="How do reminders work?">
+                <span class="q">How do reminders work?</span>
+                <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="rgba(255,255,255,.92)"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </summary>
+              <div class="a">
+                After you save a document with an expiry date, ExpiryX schedules reminders ahead of time so you can act
+                early.
+              </div>
+            </details>
+
+            <details class="faq-item">
+              <summary aria-label="Is sign-in secure?">
+                <span class="q">Is sign-in secure?</span>
+                <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="rgba(255,255,255,.92)"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </summary>
+              <div class="a">Yes—ExpiryX supports OTP-based sign-in for quick and secure access.</div>
+            </details>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer role="contentinfo">
+      <div class="container">
+        <div class="footer-inner">
+          <div class="fineprint">
+            © <span id="year"></span> ExpiryX. All rights reserved. Support:
+            <a href="mailto:ramsitservices05@gmail.com" aria-label="Email support at ramsitservices05@gmail.com"
+              >ramsitservices05@gmail.com</a
+            >
+          </div>
+          <div class="footer-links" aria-label="Legal links">
+            <a href="PRIVACY_POLICY_LINK_HERE" aria-label="Privacy Policy link">Privacy Policy</a>
+            <a href="TERMS_LINK_HERE" aria-label="Terms link">Terms</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        const yearEl = document.getElementById("year");
+        if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+        // Mobile drawer
+        const menuBtn = document.getElementById("menuBtn");
+        const drawer = document.getElementById("mobile-drawer");
+        const drawerLinks = drawer ? Array.from(drawer.querySelectorAll("a")) : [];
+
+        function setDrawer(open) {
+          if (!menuBtn || !drawer) return;
+          menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+          drawer.setAttribute("aria-hidden", open ? "false" : "true");
+        }
+
+        if (menuBtn && drawer) {
+          menuBtn.addEventListener("click", () => {
+            const isOpen = menuBtn.getAttribute("aria-expanded") === "true";
+            setDrawer(!isOpen);
+          });
+
+          drawerLinks.forEach((a) =>
+            a.addEventListener("click", () => {
+              setDrawer(false);
+            }),
+          );
+
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") setDrawer(false);
+          });
+        }
+
+        // Optional iOS note when App Store link is empty / placeholder
+        const appStoreBtn = document.getElementById("appStoreBtn");
+        const iosNote = document.getElementById("iosNote");
+        if (appStoreBtn) {
+          const href = (appStoreBtn.getAttribute("href") || "").trim();
+          const isEmpty = !href || href === "#" || href === "APPSTORE_LINK_HERE";
+          if (isEmpty) {
+            appStoreBtn.setAttribute("aria-disabled", "true");
+            appStoreBtn.setAttribute("tabindex", "-1");
+            appStoreBtn.removeAttribute("href");
+            if (iosNote) iosNote.hidden = false;
+          }
+        }
+
+        // FAQ accordion behavior: keep it clean (one open at a time)
+        const faqItems = Array.from(document.querySelectorAll(".faq-item"));
+        faqItems.forEach((item) => {
+          item.addEventListener("toggle", () => {
+            if (!item.open) return;
+            faqItems.forEach((other) => {
+              if (other !== item) other.open = false;
+            });
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>

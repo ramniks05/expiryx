@@ -1,0 +1,10 @@
+# Ignore everything by default (safety: this repo is at your home folder)
+*
+
+# Keep this file
+!.gitignore
+
+# Track only the ExpiryX landing folder
+!expiryx/
+!expiryx/**
+
