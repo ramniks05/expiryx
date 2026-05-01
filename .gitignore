@@ -10,3 +10,7 @@
 !delete-account.html
 !app-arm64-v8a-release.apk
 
+# Track website screenshot assets
+!assets/
+!assets/**
+

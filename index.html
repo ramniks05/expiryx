@@ -652,7 +652,7 @@
 
       .shots {
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
+        grid-template-columns: repeat(5, minmax(180px, 1fr));
         gap: 10px;
         overflow: auto;
         padding-bottom: 4px;
@@ -662,7 +662,7 @@
       .shot {
         scroll-snap-align: start;
         min-width: 180px;
-        height: 120px;
+        height: 360px;
         border-radius: 18px;
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid rgba(255, 255, 255, 0.12);
@@ -671,16 +671,11 @@
         overflow: hidden;
       }
 
-      .shot::after {
-        content: "Screenshot";
-        position: absolute;
-        inset: 0;
-        display: grid;
-        place-items: center;
-        color: rgba(255, 255, 255, 0.55);
-        font-size: 12px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
+      .shot img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
       }
 
       .about {
@@ -886,12 +881,12 @@
         }
 
         .shots {
-          grid-template-columns: repeat(6, 1fr);
+          grid-template-columns: repeat(5, minmax(0, 1fr));
           overflow: visible;
         }
 
         .shot {
-          min-width: auto;
+          min-width: 0;
         }
 
         .footer-inner {
@@ -1268,16 +1263,25 @@
         <div class="container">
           <div class="section-head">
             <h2 id="shots-title">Screenshots</h2>
-            <p>Placeholders for app screens. Replace with real images when ready.</p>
+            <p>A quick look at the ExpiryX app experience.</p>
           </div>
 
-          <div class="shots" aria-label="Screenshots placeholder strip">
-            <div class="shot" role="img" aria-label="Screenshot placeholder 1"></div>
-            <div class="shot" role="img" aria-label="Screenshot placeholder 2"></div>
-            <div class="shot" role="img" aria-label="Screenshot placeholder 3"></div>
-            <div class="shot" role="img" aria-label="Screenshot placeholder 4"></div>
-            <div class="shot" role="img" aria-label="Screenshot placeholder 5"></div>
-            <div class="shot" role="img" aria-label="Screenshot placeholder 6"></div>
+          <div class="shots" aria-label="ExpiryX app screenshots">
+            <a class="shot" href="./assets/screen-1.png" target="_blank" rel="noopener noreferrer">
+              <img src="./assets/screen-1.png" alt="ExpiryX sign-in screen" loading="lazy" />
+            </a>
+            <a class="shot" href="./assets/screen-2.png" target="_blank" rel="noopener noreferrer">
+              <img src="./assets/screen-2.png" alt="ExpiryX settings screen" loading="lazy" />
+            </a>
+            <a class="shot" href="./assets/screen-3.png" target="_blank" rel="noopener noreferrer">
+              <img src="./assets/screen-3.png" alt="ExpiryX documents list screen" loading="lazy" />
+            </a>
+            <a class="shot" href="./assets/screen-4.png" target="_blank" rel="noopener noreferrer">
+              <img src="./assets/screen-4.png" alt="ExpiryX OTP verification screen" loading="lazy" />
+            </a>
+            <a class="shot" href="./assets/screen-5.png" target="_blank" rel="noopener noreferrer">
+              <img src="./assets/screen-5.png" alt="ExpiryX home dashboard screen" loading="lazy" />
+            </a>
           </div>
         </div>
       </section>
