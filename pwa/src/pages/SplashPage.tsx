@@ -5,7 +5,8 @@ import { getAppConfig } from '../api/appConfig'
 import { ApiError } from '../api/client'
 import { AppLogo } from '../components/AppLogo'
 import { useAuthHydrated } from '../hooks/useAuthHydrated'
-import { isAuthError } from '../lib/authSession'
+import { clearAuthSession, isAuthError } from '../lib/authSession'
+import { isTokenExpired } from '../lib/jwt'
 import { useAuthStore } from '../store/authStore'
 
 export function SplashPage() {
@@ -17,6 +18,11 @@ export function SplashPage() {
     if (!hydrated) return
 
     let cancelled = false
+
+    const goLogin = () => {
+      clearAuthSession()
+      if (!cancelled) navigate('/login', { replace: true })
+    }
 
     ;(async () => {
       try {
@@ -30,8 +36,9 @@ export function SplashPage() {
         /* offline or config unavailable — continue */
       }
 
-      if (!session?.accessToken) {
-        if (!cancelled) navigate('/login', { replace: true })
+      const token = session?.accessToken
+      if (!token || isTokenExpired(token)) {
+        goLogin()
         return
       }
 
@@ -40,6 +47,10 @@ export function SplashPage() {
         if (!cancelled) navigate('/app', { replace: true })
       } catch (e) {
         if (e instanceof ApiError && isAuthError(e.status)) return
+        if (isTokenExpired(useAuthStore.getState().session?.accessToken)) {
+          goLogin()
+          return
+        }
         if (!cancelled) navigate('/app', { replace: true })
       }
     })()

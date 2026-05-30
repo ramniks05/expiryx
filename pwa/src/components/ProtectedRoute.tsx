@@ -1,5 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuthHydrated } from '../hooks/useAuthHydrated'
+import { clearAuthSession } from '../lib/authSession'
+import { isTokenExpired } from '../lib/jwt'
 import { useAuthStore } from '../store/authStore'
 
 export function ProtectedRoute() {
@@ -14,6 +16,9 @@ export function ProtectedRoute() {
     )
   }
 
-  if (!session?.accessToken) return <Navigate to="/login" replace />
+  if (!session?.accessToken || isTokenExpired(session.accessToken)) {
+    clearAuthSession()
+    return <Navigate to="/login" replace />
+  }
   return <Outlet />
 }

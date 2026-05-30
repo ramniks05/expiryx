@@ -1,5 +1,6 @@
 import type { ApiErrorBody, AppConfig } from '../types'
 import { forceLogout, isAuthError } from '../lib/authSession'
+import { isTokenExpired } from '../lib/jwt'
 import { appPath } from '../lib/paths'
 import { getAccessToken } from '../store/authStore'
 
@@ -52,7 +53,11 @@ export async function apiFetch<T>(
 
   if (auth) {
     const token = getAccessToken()
-    if (token) headers.set('Authorization', `Bearer ${token}`)
+    if (!token || isTokenExpired(token)) {
+      forceLogout()
+      throw new ApiError(401, 'Session expired')
+    }
+    headers.set('Authorization', `Bearer ${token}`)
     Object.entries(versionHeaders()).forEach(([k, v]) => headers.set(k, v))
   }
 
@@ -91,7 +96,11 @@ export async function apiMultipart<T>(
 ): Promise<T> {
   const token = getAccessToken()
   const headers = new Headers(versionHeaders())
-  if (token) headers.set('Authorization', `Bearer ${token}`)
+  if (!token || isTokenExpired(token)) {
+    forceLogout()
+    throw new ApiError(401, 'Session expired')
+  }
+  headers.set('Authorization', `Bearer ${token}`)
 
   const res = await fetch(`${BASE}${path}`, { method, headers, body: formData })
 
@@ -118,10 +127,12 @@ export async function apiMultipart<T>(
 function authHeaders(accept = 'application/json'): Headers {
   const headers = new Headers({ Accept: accept })
   const token = getAccessToken()
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`)
-    Object.entries(versionHeaders()).forEach(([k, v]) => headers.set(k, v))
+  if (!token || isTokenExpired(token)) {
+    forceLogout()
+    throw new ApiError(401, 'Session expired')
   }
+  headers.set('Authorization', `Bearer ${token}`)
+  Object.entries(versionHeaders()).forEach(([k, v]) => headers.set(k, v))
   return headers
 }
 

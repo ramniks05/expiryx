@@ -1,6 +1,8 @@
-import { apiFetch } from './client'
+import { apiFetch, ApiError } from './client'
 import { listDocuments } from './documents'
 import type { AuthSession } from '../types'
+import { isTokenExpired } from '../lib/jwt'
+import { useAuthStore } from '../store/authStore'
 
 export async function sendOtp(mobileNumber: string) {
   return apiFetch<{ message: string; otp?: string }>('/api/auth/send-otp', {
@@ -31,8 +33,12 @@ export async function updateProfile(userId: number, name: string, email: string)
   })
 }
 
-/** Returns true when the stored access token is still valid. */
+/** Returns true when the stored access token is still valid on client and server. */
 export async function validateSession() {
+  const session = useAuthStore.getState().session
+  if (!session?.accessToken || isTokenExpired(session.accessToken)) {
+    throw new ApiError(401, 'Session expired')
+  }
   await listDocuments({ page: 0, size: 1 })
   return true
 }

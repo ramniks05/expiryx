@@ -5,7 +5,8 @@ import { AppLogo } from '../components/AppLogo'
 import { resendOtp, sendOtp, validateSession, verifyOtp } from '../api/auth'
 import { ApiError } from '../api/client'
 import { useToast } from '../components/Toast'
-import { isAuthError } from '../lib/authSession'
+import { clearAuthSession, isAuthError } from '../lib/authSession'
+import { isTokenExpired } from '../lib/jwt'
 import { useAuthStore } from '../store/authStore'
 import { normalizeOtp, useWebOtpAutofill } from '../hooks/useWebOtpAutofill'
 
@@ -50,7 +51,12 @@ export function LoginPage() {
   useWebOtpAutofill(applyOtp, step === 'otp')
 
   useEffect(() => {
-    if (!session?.accessToken) return
+    const token = session?.accessToken
+    if (!token) return
+    if (isTokenExpired(token)) {
+      clearAuthSession()
+      return
+    }
 
     let cancelled = false
     ;(async () => {
@@ -59,7 +65,7 @@ export function LoginPage() {
         if (!cancelled) navigate('/app', { replace: true })
       } catch (e) {
         if (e instanceof ApiError && isAuthError(e.status)) return
-        if (!cancelled) navigate('/app', { replace: true })
+        clearAuthSession()
       }
     })()
 
