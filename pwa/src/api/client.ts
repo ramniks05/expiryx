@@ -115,4 +115,37 @@ export async function apiMultipart<T>(
   return (await parseJson<T>(res)) as T
 }
 
+function authHeaders(accept = 'application/json'): Headers {
+  const headers = new Headers({ Accept: accept })
+  const token = getAccessToken()
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`)
+    Object.entries(versionHeaders()).forEach(([k, v]) => headers.set(k, v))
+  }
+  return headers
+}
+
+/** Fetch a file (document image) with auth — required because img tags cannot send Bearer tokens. */
+export async function fetchAuthenticatedBlob(url: string): Promise<Blob> {
+  const res = await fetch(url, { headers: authHeaders('image/*,*/*') })
+
+  if (isAuthError(res.status)) {
+    forceLogout()
+    throw new ApiError(res.status, 'Session expired')
+  }
+
+  if (res.status === 426) {
+    const body = await parseJson<AppConfig>(res.clone())
+    sessionStorage.setItem('expiryx-force-update', JSON.stringify(body))
+    window.location.href = appPath('/force-update')
+    throw new ApiError(426, 'Update required', body)
+  }
+
+  if (!res.ok) {
+    throw new ApiError(res.status, res.statusText || 'Failed to load file')
+  }
+
+  return res.blob()
+}
+
 export { BASE as API_BASE_URL }
