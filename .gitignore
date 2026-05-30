@@ -4,12 +4,26 @@
 # Keep this file
 !.gitignore
 
-# Track only the ExpiryX landing files at repo root
+# Track landing site files at repo root
 !index.html
 !privacy-policy.html
 !delete-account.html
+!vercel.json
+!package.json
 
 # Track website screenshot assets
 !assets/
 !assets/**
 
+# Track PWA source
+!pwa/
+!pwa/**
+
+# Track built PWA output (run: cd pwa && npm run build)
+!app/
+!app/**
+
+# Ignore PWA dependencies and secrets
+pwa/node_modules/
+pwa/dist/
+pwa/.env

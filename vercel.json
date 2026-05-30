@@ -1,0 +1,18 @@
+{
+  "buildCommand": "npm run build",
+  "installCommand": "cd pwa && npm ci",
+  "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/app/:path*", "destination": "/app/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/app/sw.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/app/workbox-(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    }
+  ]
+}

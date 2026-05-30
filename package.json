@@ -1,0 +1,7 @@
+{
+  "name": "expiryx",
+  "private": true,
+  "scripts": {
+    "build": "cd pwa && npm run build"
+  }
+}
