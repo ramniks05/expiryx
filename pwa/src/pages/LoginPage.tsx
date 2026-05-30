@@ -2,9 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CalendarClock, Bell, Lock, MessageCircle, ShieldCheck } from 'lucide-react'
 import { AppLogo } from '../components/AppLogo'
-import { resendOtp, sendOtp, verifyOtp } from '../api/auth'
+import { resendOtp, sendOtp, validateSession, verifyOtp } from '../api/auth'
 import { ApiError } from '../api/client'
 import { useToast } from '../components/Toast'
+import { isAuthError } from '../lib/authSession'
 import { useAuthStore } from '../store/authStore'
 import { normalizeOtp, useWebOtpAutofill } from '../hooks/useWebOtpAutofill'
 
@@ -49,7 +50,22 @@ export function LoginPage() {
   useWebOtpAutofill(applyOtp, step === 'otp')
 
   useEffect(() => {
-    if (session) navigate('/app', { replace: true })
+    if (!session?.accessToken) return
+
+    let cancelled = false
+    ;(async () => {
+      try {
+        await validateSession()
+        if (!cancelled) navigate('/app', { replace: true })
+      } catch (e) {
+        if (e instanceof ApiError && isAuthError(e.status)) return
+        if (!cancelled) navigate('/app', { replace: true })
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
   }, [session, navigate])
 
   useEffect(() => {

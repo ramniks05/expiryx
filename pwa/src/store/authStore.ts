@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { AuthSession } from '../types'
+import { AUTH_STORAGE_KEY } from '../lib/authStorage'
 
 interface AuthState {
   session: AuthSession | null
@@ -18,9 +19,12 @@ export const useAuthStore = create<AuthState>()(
         set((state) =>
           state.session ? { session: { ...state.session, ...patch } } : state,
         ),
-      clearSession: () => set({ session: null }),
+      clearSession: () => {
+        localStorage.removeItem(AUTH_STORAGE_KEY)
+        set({ session: null })
+      },
     }),
-    { name: 'expiryx-auth' },
+    { name: AUTH_STORAGE_KEY },
   ),
 )
 

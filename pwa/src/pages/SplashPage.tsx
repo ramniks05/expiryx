@@ -1,15 +1,23 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../store/authStore'
+import { validateSession } from '../api/auth'
 import { getAppConfig } from '../api/appConfig'
+import { ApiError } from '../api/client'
 import { AppLogo } from '../components/AppLogo'
+import { useAuthHydrated } from '../hooks/useAuthHydrated'
+import { isAuthError } from '../lib/authSession'
+import { useAuthStore } from '../store/authStore'
 
 export function SplashPage() {
   const navigate = useNavigate()
+  const hydrated = useAuthHydrated()
   const session = useAuthStore((s) => s.session)
 
   useEffect(() => {
+    if (!hydrated) return
+
     let cancelled = false
+
     ;(async () => {
       try {
         const config = await getAppConfig()
@@ -21,12 +29,25 @@ export function SplashPage() {
       } catch {
         /* offline or config unavailable — continue */
       }
-      if (!cancelled) navigate(session ? '/app' : '/login', { replace: true })
+
+      if (!session?.accessToken) {
+        if (!cancelled) navigate('/login', { replace: true })
+        return
+      }
+
+      try {
+        await validateSession()
+        if (!cancelled) navigate('/app', { replace: true })
+      } catch (e) {
+        if (e instanceof ApiError && isAuthError(e.status)) return
+        if (!cancelled) navigate('/app', { replace: true })
+      }
     })()
+
     return () => {
       cancelled = true
     }
-  }, [navigate, session])
+  }, [hydrated, navigate, session])
 
   return (
     <div className="app-screen flex flex-col items-center justify-center bg-background safe-top safe-bottom">

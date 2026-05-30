@@ -1,4 +1,5 @@
 import { apiFetch } from './client'
+import { listDocuments } from './documents'
 import type { AuthSession } from '../types'
 
 export async function sendOtp(mobileNumber: string) {
@@ -28,4 +29,10 @@ export async function updateProfile(userId: number, name: string, email: string)
     auth: true,
     json: { name, email },
   })
+}
+
+/** Returns true when the stored access token is still valid. */
+export async function validateSession() {
+  await listDocuments({ page: 0, size: 1 })
+  return true
 }

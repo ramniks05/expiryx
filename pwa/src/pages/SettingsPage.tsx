@@ -1,15 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { ChevronRight, Info, LogOut, User } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
+import { clearAuthSession } from '../lib/authSession'
 import { InstallPrompt } from '../components/InstallPrompt'
 
 export function SettingsPage() {
   const navigate = useNavigate()
   const session = useAuthStore((s) => s.session)
-  const clearSession = useAuthStore((s) => s.clearSession)
-
   const logout = () => {
-    clearSession()
+    clearAuthSession()
     navigate('/login', { replace: true })
   }
 

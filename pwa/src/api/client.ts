@@ -1,6 +1,7 @@
 import type { ApiErrorBody, AppConfig } from '../types'
+import { forceLogout, isAuthError } from '../lib/authSession'
 import { appPath } from '../lib/paths'
-import { getAccessToken, useAuthStore } from '../store/authStore'
+import { getAccessToken } from '../store/authStore'
 
 const BASE = import.meta.env.VITE_API_BASE_URL ?? 'https://doctracker-backend.onrender.com'
 
@@ -61,10 +62,9 @@ export async function apiFetch<T>(
     body: json !== undefined ? JSON.stringify(json) : init.body,
   })
 
-  if (res.status === 401) {
-    useAuthStore.getState().clearSession()
-    window.location.href = appPath('/login')
-    throw new ApiError(401, 'Session expired')
+  if (isAuthError(res.status)) {
+    forceLogout()
+    throw new ApiError(res.status, 'Session expired')
   }
 
   if (res.status === 426) {
@@ -95,10 +95,9 @@ export async function apiMultipart<T>(
 
   const res = await fetch(`${BASE}${path}`, { method, headers, body: formData })
 
-  if (res.status === 401) {
-    useAuthStore.getState().clearSession()
-    window.location.href = appPath('/login')
-    throw new ApiError(401, 'Session expired')
+  if (isAuthError(res.status)) {
+    forceLogout()
+    throw new ApiError(res.status, 'Session expired')
   }
 
   if (res.status === 426) {
