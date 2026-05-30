@@ -16,6 +16,14 @@ import { AlertsPage } from './pages/AlertsPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { ProfileEditPage } from './pages/ProfileEditPage'
 import { ForceUpdatePage } from './pages/ForceUpdatePage'
+import { AdminLoginPage } from './pages/admin/AdminLoginPage'
+import { AdminOverviewPage } from './pages/admin/AdminOverviewPage'
+import { AdminDocumentsPage } from './pages/admin/AdminDocumentsPage'
+import { AdminGrowthPage } from './pages/admin/AdminGrowthPage'
+import { AdminUsersPage } from './pages/admin/AdminUsersPage'
+import { AdminUserDetailPage } from './pages/admin/AdminUserDetailPage'
+import { AdminShell } from './components/admin/AdminShell'
+import { AdminProtectedRoute } from './components/admin/AdminProtectedRoute'
 
 export default function App() {
   return (
@@ -27,6 +35,16 @@ export default function App() {
             <Route path="/" element={<SplashPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/force-update" element={<ForceUpdatePage />} />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route element={<AdminProtectedRoute />}>
+              <Route path="/admin" element={<AdminShell />}>
+                <Route index element={<AdminOverviewPage />} />
+                <Route path="documents" element={<AdminDocumentsPage />} />
+                <Route path="growth" element={<AdminGrowthPage />} />
+                <Route path="users" element={<AdminUsersPage />} />
+                <Route path="users/:id" element={<AdminUserDetailPage />} />
+              </Route>
+            </Route>
             <Route element={<ProtectedRoute />}>
               <Route path="/app" element={<AppShell />}>
                 <Route index element={<DashboardPage />} />
