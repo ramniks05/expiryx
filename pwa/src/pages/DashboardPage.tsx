@@ -57,18 +57,14 @@ export function DashboardPage() {
           <p className="app-subtitle">Hello,</p>
           <h1 className="app-title">{session?.name ?? 'User'}</h1>
         </div>
-        <div
-          className="flex items-center gap-2 rounded-[var(--radius-pill)] px-3 py-1.5 text-xs font-semibold"
-          style={{ background: 'var(--color-primary-12)', color: 'var(--color-primary)' }}
+        <Link
+          to="/app/settings"
+          aria-label="Open settings"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+          style={{ background: 'var(--color-primary)', color: 'var(--color-on-primary)' }}
         >
-          <span
-            className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-            style={{ background: 'var(--color-primary)', color: 'var(--color-on-primary)' }}
-          >
-            {(session?.name ?? 'U').charAt(0).toUpperCase()}
-          </span>
-          <span className="max-w-[100px] truncate">{session?.name ?? session?.mobileNumber}</span>
-        </div>
+          {(session?.name ?? 'U').charAt(0).toUpperCase()}
+        </Link>
       </div>
 
       <div className="mt-5 grid grid-cols-3 gap-2">

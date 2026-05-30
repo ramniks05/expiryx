@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AppShell } from './components/AppShell'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { ToastProvider } from './components/Toast'
+import { AddToHomeScreenPrompt } from './components/AddToHomeScreenPrompt'
 import { SplashPage } from './pages/SplashPage'
 import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
@@ -25,6 +26,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
+        <AddToHomeScreenPrompt />
         <BrowserRouter basename="/app">
           <Routes>
             <Route path="/" element={<SplashPage />} />
