@@ -21,7 +21,7 @@ export function useWebOtpAutofill(onCode: (code: string) => void, enabled: boole
       } as CredentialRequestOptions)
       .then((cred) => {
         const code = (cred as OTPCredential | null)?.code
-        if (code) onCodeRef.current(code.replace(/\D/g, '').slice(0, 6))
+        if (code) onCodeRef.current(code.replace(/\D/g, '').slice(0, 4))
       })
       .catch(() => {
         /* user dismissed, unsupported SMS format, or timeout */

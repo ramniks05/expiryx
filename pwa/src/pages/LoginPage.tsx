@@ -24,6 +24,7 @@ export function LoginPage() {
   const session = useAuthStore((s) => s.session)
   const otpInputRef = useRef<HTMLInputElement>(null)
   const lastAutoVerifyOtp = useRef('')
+  const loadingRef = useRef(false)
 
   const [mobile, setMobile] = useState('')
   const [otp, setOtp] = useState('')
@@ -32,8 +33,17 @@ export function LoginPage() {
   const [devOtp, setDevOtp] = useState<string | null>(null)
   const [timer, setTimer] = useState(0)
 
+  loadingRef.current = loading
+
   const applyOtp = useCallback((code: string) => {
     setOtp(normalizeOtp(code, OTP_LENGTH))
+  }, [])
+
+  const syncOtpFromDom = useCallback(() => {
+    const el = otpInputRef.current
+    if (!el) return
+    const next = normalizeOtp(el.value, OTP_LENGTH)
+    setOtp((prev) => (prev === next ? prev : next))
   }, [])
 
   useWebOtpAutofill(applyOtp, step === 'otp')
@@ -52,9 +62,30 @@ export function LoginPage() {
     if (step === 'otp') otpInputRef.current?.focus()
   }, [step])
 
+  // iOS SMS autofill often updates the DOM without firing React onChange.
+  useEffect(() => {
+    if (step !== 'otp') return
+    const el = otpInputRef.current
+    if (!el) return
+
+    const onNativeInput = () => syncOtpFromDom()
+    el.addEventListener('input', onNativeInput)
+    el.addEventListener('change', onNativeInput)
+    el.addEventListener('keyup', onNativeInput)
+
+    const poll = window.setInterval(syncOtpFromDom, 200)
+
+    return () => {
+      el.removeEventListener('input', onNativeInput)
+      el.removeEventListener('change', onNativeInput)
+      el.removeEventListener('keyup', onNativeInput)
+      window.clearInterval(poll)
+    }
+  }, [step, syncOtpFromDom])
+
   const submitVerify = useCallback(
     async (code: string) => {
-      if (code.length !== OTP_LENGTH || loading) return
+      if (code.length !== OTP_LENGTH || loadingRef.current) return
       setLoading(true)
       try {
         const res = await verifyOtp(mobile, code)
@@ -72,11 +103,11 @@ export function LoginPage() {
         setLoading(false)
       }
     },
-    [loading, mobile, navigate, setSession, showToast],
+    [mobile, navigate, setSession, showToast],
   )
 
   useEffect(() => {
-    if (step !== 'otp' || otp.length !== OTP_LENGTH || loading) return
+    if (step !== 'otp' || otp.length !== OTP_LENGTH || loadingRef.current) return
     if (lastAutoVerifyOtp.current === otp) return
     lastAutoVerifyOtp.current = otp
     void submitVerify(otp)
@@ -137,14 +168,14 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-full bg-background px-5 py-8 safe-top safe-bottom">
-      <div className="mx-auto max-w-md">
-        <div className="flex flex-col items-center pt-6">
-          <AppLogo size={120} />
+    <div className="app-screen bg-background safe-top safe-bottom">
+      <div className="app-page">
+        <div className="flex flex-col items-center pt-4">
+          <AppLogo size={96} />
           <p className="app-subtitle mt-3">Expiry Reminder</p>
         </div>
 
-        <div className="mt-6 grid grid-cols-3 gap-2">
+        <div className="mt-6 grid min-w-0 grid-cols-3 gap-2">
           {features.map(({ label, icon: Icon, tint }) => (
             <div key={label} className="app-card p-3 text-center">
               <Icon size={22} className="mx-auto mb-1" style={{ color: tint }} />
@@ -181,7 +212,7 @@ export function LoginPage() {
                     value={mobile}
                     onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     placeholder="Enter your mobile..."
-                    className="flex-1 border-0 bg-card px-3 py-3.5 text-sm outline-none"
+                    className="min-w-0 flex-1 border-0 bg-card px-3 py-3.5 text-base outline-none"
                     style={{ color: 'var(--color-text-primary)' }}
                   />
                 </div>
@@ -208,10 +239,15 @@ export function LoginPage() {
                   autoComplete="one-time-code"
                   maxLength={OTP_LENGTH}
                   value={otp}
+                  onInput={(e) => {
+                    lastAutoVerifyOtp.current = ''
+                    setOtp(normalizeOtp(e.currentTarget.value, OTP_LENGTH))
+                  }}
                   onChange={(e) => {
                     lastAutoVerifyOtp.current = ''
                     setOtp(normalizeOtp(e.target.value, OTP_LENGTH))
                   }}
+                  onBlur={syncOtpFromDom}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && otp.length === OTP_LENGTH && !loading) handleVerify()
                   }}

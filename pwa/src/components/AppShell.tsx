@@ -3,7 +3,7 @@ import { BottomNav } from './BottomNav'
 
 export function AppShell() {
   return (
-    <div className="min-h-full bg-background pb-[86px] safe-top">
+    <div className="app-shell bg-background safe-top">
       <Outlet />
       <BottomNav />
     </div>

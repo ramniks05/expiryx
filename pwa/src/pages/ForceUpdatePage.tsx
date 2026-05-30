@@ -10,7 +10,7 @@ export function ForceUpdatePage() {
   }
 
   return (
-    <div className="flex min-h-full flex-col items-center justify-center bg-background px-6 text-center safe-top safe-bottom">
+    <div className="app-screen flex flex-col items-center justify-center bg-background px-6 text-center safe-top safe-bottom">
       <div
         className="flex h-16 w-16 items-center justify-center rounded-2xl text-2xl"
         style={{ background: 'var(--color-warning-12)', color: 'var(--color-warning)' }}

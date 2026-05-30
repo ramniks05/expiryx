@@ -29,8 +29,8 @@ export function SplashPage() {
   }, [navigate, session])
 
   return (
-    <div className="flex min-h-full flex-col items-center justify-center bg-background safe-top safe-bottom">
-      <AppLogo size={120} />
+    <div className="app-screen flex flex-col items-center justify-center bg-background safe-top safe-bottom">
+      <AppLogo size={96} />
       <p className="app-subtitle mt-4">Expiry Reminder</p>
       <div
         className="mt-8 h-1 w-24 animate-pulse rounded-full"

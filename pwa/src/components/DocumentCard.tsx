@@ -14,7 +14,7 @@ export function DocumentCard({ doc }: Props) {
   return (
     <Link
       to={`/app/documents/${doc.id}`}
-      className={`app-card flex items-center gap-3 border-l-4 p-4 ${statusAccentBorder(status)}`}
+      className={`app-card flex min-w-0 items-center gap-2 border-l-4 p-3 sm:gap-3 sm:p-4 ${statusAccentBorder(status)}`}
     >
       <div
         className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
